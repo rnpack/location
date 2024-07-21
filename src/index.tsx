@@ -20,3 +20,6 @@ const Location = NativeModules.Location
 export function multiply(a: number, b: number): Promise<number> {
   return Location.multiply(a, b);
 }
+
+export * from './helpers';
+export * from './hooks';

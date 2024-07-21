@@ -8,6 +8,11 @@ Location permissions and adapter state
 npm install @rnpack/location
 ```
 
+## Required dependencies
+```sh
+npm i @react-native-community/geolocation @rnpack/utils react-native-design react-native-location react-native-system-setting react-native-vector-icons
+```
+
 ## Usage
 
 ```js
