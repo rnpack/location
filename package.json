@@ -1,6 +1,6 @@
 {
   "name": "@rnpack/location",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Location permissions and adapter state",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
