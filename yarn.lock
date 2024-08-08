@@ -2613,6 +2613,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@react-native-async-storage/async-storage@npm:^1.24.0":
+  version: 1.24.0
+  resolution: "@react-native-async-storage/async-storage@npm:1.24.0"
+  dependencies:
+    merge-options: ^3.0.4
+  peerDependencies:
+    react-native: ^0.0.0-0 || >=0.60 <1.0
+  checksum: 7e56a2e97f48332f57c56ebf473b763c7ca2b1ef82f4b5f8e1c73350231ec91b8eafc4e4d1f972c4c1005da0d304816fa725dc6f07a8a7543e90f8bd16c22ab4
+  languageName: node
+  linkType: hard
+
 "@react-native-community/cli-clean@npm:13.6.9":
   version: 13.6.9
   resolution: "@react-native-community/cli-clean@npm:13.6.9"
@@ -3061,15 +3072,16 @@ __metadata:
     "@babel/core": ^7.20.0
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@react-native-async-storage/async-storage": ^1.24.0
     "@react-native-community/geolocation": ^3.3.0
     "@react-native/babel-preset": 0.74.85
     "@react-native/metro-config": 0.74.85
     "@react-native/typescript-config": 0.74.85
-    "@rnpack/utils": ^0.1.3
+    "@rnpack/utils": ^0.1.5
     babel-plugin-module-resolver: ^5.0.0
     react: 18.2.0
     react-native: 0.74.3
-    react-native-design: ^0.1.3
+    react-native-design: ^0.1.8
     react-native-location: ^2.5.0
     react-native-system-setting: ^1.7.6
     react-native-vector-icons: ^10.1.0
@@ -3085,7 +3097,7 @@ __metadata:
     "@react-native-community/geolocation": ^3.3.0
     "@react-native/eslint-config": ^0.73.1
     "@release-it/conventional-changelog": ^5.0.0
-    "@rnpack/utils": ^0.1.3
+    "@rnpack/utils": ^0.1.5
     "@types/jest": ^29.5.5
     "@types/react": ^18.2.44
     commitlint: ^17.0.2
@@ -3098,7 +3110,7 @@ __metadata:
     react: 18.2.0
     react-native: 0.74.3
     react-native-builder-bob: ^0.26.0
-    react-native-design: ^0.1.3
+    react-native-design: ^0.1.8
     react-native-location: ^2.5.0
     react-native-system-setting: ^1.7.6
     release-it: ^15.0.0
@@ -3115,13 +3127,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@rnpack/utils@npm:^0.1.3":
-  version: 0.1.3
-  resolution: "@rnpack/utils@npm:0.1.3"
+"@rnpack/utils@npm:^0.1.5":
+  version: 0.1.5
+  resolution: "@rnpack/utils@npm:0.1.5"
   peerDependencies:
+    "@react-native-async-storage/async-storage": "*"
     react: "*"
     react-native: "*"
-  checksum: 3065f99f77e37e11f1a1524b13a46b9784c9f2c851cd880b3527090aa53c86ef7be8246bb68b64f500aba79c06a6098b7d5706daa0254ca2ad6888a7ced16d8a
+  checksum: 0857f650863734c6c56c87fd1876eb2344aa5bf440100045f3a731d8baf239233a458b082c50898d28ec4d829b28f98beed8b88a755315c334c2f74973e882af
   languageName: node
   linkType: hard
 
@@ -7911,6 +7924,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-plain-obj@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "is-plain-obj@npm:2.1.0"
+  checksum: cec9100678b0a9fe0248a81743041ed990c2d4c99f893d935545cfbc42876cbe86d207f3b895700c690ad2fa520e568c44afc1605044b535a7820c1d40e38daa
+  languageName: node
+  linkType: hard
+
 "is-plain-object@npm:^2.0.4":
   version: 2.0.4
   resolution: "is-plain-object@npm:2.0.4"
@@ -9392,6 +9412,15 @@ __metadata:
     type-fest: ^0.18.0
     yargs-parser: ^20.2.3
   checksum: bc23bf1b4423ef6a821dff9734406bce4b91ea257e7f10a8b7f896f45b59649f07adc0926e2917eacd8cf1df9e4cd89c77623cf63dfd0f8bf54de07a32ee5a85
+  languageName: node
+  linkType: hard
+
+"merge-options@npm:^3.0.4":
+  version: 3.0.4
+  resolution: "merge-options@npm:3.0.4"
+  dependencies:
+    is-plain-obj: ^2.1.0
+  checksum: d86ddb3dd6e85d558dbf25dc944f3527b6bacb944db3fdda6e84a3f59c4e4b85231095f58b835758b9a57708342dee0f8de0dffa352974a48221487fe9f4584f
   languageName: node
   linkType: hard
 
@@ -11069,18 +11098,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-design@npm:^0.1.3":
-  version: 0.1.3
-  resolution: "react-native-design@npm:0.1.3"
+"react-native-design@npm:^0.1.8":
+  version: 0.1.8
+  resolution: "react-native-design@npm:0.1.8"
   dependencies:
     react-native-autocomplete-dropdown: ^3.1.5
     react-native-svg: ^15.3.0
   peerDependencies:
+    "@react-native-async-storage/async-storage": "*"
     "@rnpack/utils": "*"
     react: "*"
     react-native: "*"
     react-native-vector-icons: "*"
-  checksum: a3f5c6301bb61275e02036b411553b7a7cd1823ea5f8dd43b1a5e0fb52755258b6d9b1fa86384afa4f92c25e26d41a9e29216337ebb1cb8f96a6a5cde84a5c43
+  checksum: 107c0a740240942bf7ecc8643c95c5c47ebbbf9cb5106d681a5778ec3bf6d0bd4a4a8d2c4f84ee2fbc620d043b41241cfa18164d90e13eae6c6a606163ca4c3f
   languageName: node
   linkType: hard
 

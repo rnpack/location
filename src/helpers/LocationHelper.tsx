@@ -41,17 +41,21 @@ interface LocationHelperProps {
   enableLocationContent?: ReactNode;
   enableLocationDialogProps?: DialogProps;
   onLocationAdapterStateChange?: (isEnabled: boolean) => void;
+  timeInterval?: number;
 }
 
 function LocationHelper(props: LocationHelperProps) {
-  const { requestLocationAuthorization, checkLocationAuthorization } =
-    useLocation({
-      config: props?.locationConfig,
-      onGetCurrentLocationSuccess,
-      onGetCurrentLocationError,
-      onRequestLocationAuthorizationSucces,
-      onRequestLocationAuthorizationError,
-    });
+  const {
+    getCurrentLocation,
+    requestLocationAuthorization,
+    checkLocationAuthorization,
+  } = useLocation({
+    config: props?.locationConfig,
+    onGetCurrentLocationSuccess,
+    onGetCurrentLocationError,
+    onRequestLocationAuthorizationSucces,
+    onRequestLocationAuthorizationError,
+  });
   const { startLocationChangeListener } = useLocationListener({
     onLocationChange,
     onLocationWatchError,
@@ -66,6 +70,7 @@ function LocationHelper(props: LocationHelperProps) {
 
   const locationStateChangeTimerInterval = useRef<NodeJS.Timeout>();
   const locationModeChangeTimerInterval = useRef<NodeJS.Timeout>();
+  const locationUpdateTimerInterval = useRef<NodeJS.Timeout>();
 
   const [isAuthorized, setIsAuthorized] = useState<boolean>(true);
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
@@ -110,11 +115,17 @@ function LocationHelper(props: LocationHelperProps) {
     startLocationStateChangeListener();
     startLocationModeChangeListener();
 
+    if (props?.timeInterval) {
+      startLocationUpdateListener();
+    }
+
     const isGranted: boolean = await checkLocationAuthorization();
 
     if (!isGranted) {
       requestLocationAuthorization();
     }
+
+    getCurrentLocation();
 
     startLocationChangeListener();
   }
@@ -122,6 +133,7 @@ function LocationHelper(props: LocationHelperProps) {
   async function unmount() {
     stopLocationStateChangeListener();
     stopLocationModeChangeListener();
+    stopLocationUpdateListener();
   }
 
   function onLocationModeChange(_isEnabled: boolean): void {
@@ -282,6 +294,20 @@ function LocationHelper(props: LocationHelperProps) {
       default:
         console.warn('Location authorization out of scope: ', { status });
         break;
+    }
+  }
+
+  function startLocationUpdateListener() {
+    if (props?.timeInterval) {
+      locationUpdateTimerInterval.current = setInterval(() => {
+        getCurrentLocation();
+      }, props?.timeInterval);
+    }
+  }
+
+  function stopLocationUpdateListener() {
+    if (locationUpdateTimerInterval?.current) {
+      clearInterval(locationUpdateTimerInterval?.current);
     }
   }
 

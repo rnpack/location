@@ -1,34 +1,23 @@
-import { useState, Fragment, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
-import { colors, Text } from 'react-native-design';
-import type {
-  GeolocationError,
-  GeolocationResponse,
-} from '@react-native-community/geolocation';
+import { colors, Text, DesignProvider } from 'react-native-design';
 
-import { LocationHelper, useLocation } from '@rnpack/location';
+import type { GeolocationResponse } from '@react-native-community/geolocation';
+
+import { LocationHelper } from '@rnpack/location';
 
 import { locationConfig } from './configs';
 
 export default function App() {
-  const { getCurrentLocation } = useLocation({
-    config: locationConfig,
-    onGetCurrentLocationSuccess,
-    onGetCurrentLocationError,
-  });
-
   const [isAuthorized, setIsAuthorized] = useState<boolean>(true);
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [location, setLocation] = useState<GeolocationResponse>();
 
   useEffect(() => {
     mount();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function mount(): void {
-    getCurrentLocation();
-  }
+  function mount(): void {}
 
   function onLocationChange(_location: GeolocationResponse) {
     console.info('Calling location change: ', _location);
@@ -43,16 +32,8 @@ export default function App() {
     setIsEnabled(_isEnabled);
   }
 
-  function onGetCurrentLocationSuccess(position: GeolocationResponse) {
-    setLocation(position);
-  }
-  function onGetCurrentLocationError(error: GeolocationError) {
-    console.log('Get current location Error: ', error?.message);
-    setLocation(undefined);
-  }
-
   return (
-    <Fragment>
+    <DesignProvider>
       <View style={styles.container}>
         <Text>
           Location Authorization:{' '}
@@ -82,8 +63,9 @@ export default function App() {
           </Text>
         }
         onLocationAdapterStateChange={onLocationAdapterStateChange}
+        timeInterval={30000}
       />
-    </Fragment>
+    </DesignProvider>
   );
 }
 
