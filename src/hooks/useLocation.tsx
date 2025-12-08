@@ -27,7 +27,7 @@ interface UseLocationProps {
   config: GeolocationConfiguration;
   onGetCurrentLocationSuccess?: (position: GeolocationResponse) => void;
   onGetCurrentLocationError?: (error: GeolocationError) => void;
-  onRequestLocationAuthorizationSucces?: (success: boolean) => void;
+  onRequestLocationAuthorizationSuccess?: (success: boolean) => void;
   onRequestLocationAuthorizationError?: (
     args: onRequestLocationAuthorizationErrorArgs
   ) => void;
@@ -58,7 +58,7 @@ function useLocation(props: UseLocationProps): UseLocationReturns {
   }
 
   function onLocationAuthorizationSuccess() {
-    props?.onRequestLocationAuthorizationSucces?.(true);
+    props?.onRequestLocationAuthorizationSuccess?.(true);
   }
 
   function onLocationAuthorizationError(error: GeolocationError) {

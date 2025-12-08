@@ -23,7 +23,7 @@ interface UseLocationListenerProps {
 function useLocationListener(
   props?: UseLocationListenerProps
 ): UseLocationListenerReturnType {
-  const locationWatchId = useRef<number>();
+  const locationWatchId = useRef<number>(undefined);
 
   useEffect(() => {
     return () => {

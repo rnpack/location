@@ -19,8 +19,10 @@ interface UseLocationModeProps {
 }
 
 function useLocationMode(props: UseLocationModeProps): UseLocationModeReturns {
-  const locationModeListenerRef = useRef<EmitterSubscription | null>();
-  const locationPowerStateListenerRef = useRef<EmitterSubscription | null>();
+  const locationModeListenerRef = useRef<EmitterSubscription | null>(null);
+  const locationPowerStateListenerRef = useRef<EmitterSubscription | null>(
+    null
+  );
 
   useEffect(() => {
     mount();

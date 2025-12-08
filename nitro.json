@@ -1,0 +1,25 @@
+{
+  "cxxNamespace": [
+    "RNPackLocation"
+  ],
+  "ios": {
+    "iosModuleName": "RNPackLocation"
+  },
+  "android": {
+    "androidNamespace": [
+      "rnpack",
+      "location"
+    ],
+    "androidCxxLibName": "RNPackLocation"
+  },
+  "autolinking": {
+    "RNPackLocation": {
+      "swift": "RNPackLocation",
+      "kotlin": "RNPackLocation"
+    }
+  },
+  "ignorePaths": [
+    "node_modules",
+    "example/node_modules"
+  ]
+}

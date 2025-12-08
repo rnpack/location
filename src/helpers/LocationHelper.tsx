@@ -8,7 +8,6 @@ import type {
   GeolocationError,
   GeolocationResponse,
 } from '@react-native-community/geolocation';
-import type { LocationPermissionStatus } from 'react-native-location';
 import { openAppCustomSettings, openLocationSettings } from '@rnpack/utils';
 
 import {
@@ -18,6 +17,7 @@ import {
   useLocationAuthorization,
 } from '../hooks';
 import type { onRequestLocationAuthorizationErrorArgs } from './../hooks';
+import type { PermissionStatus } from 'react-native-permissions';
 
 const LISTENER_TIMER_INTERVAL: number = 3000;
 
@@ -53,7 +53,7 @@ function LocationHelper(props: LocationHelperProps) {
     config: props?.locationConfig,
     onGetCurrentLocationSuccess,
     onGetCurrentLocationError,
-    onRequestLocationAuthorizationSucces,
+    onRequestLocationAuthorizationSuccess,
     onRequestLocationAuthorizationError,
   });
   const { startLocationChangeListener } = useLocationListener({
@@ -68,9 +68,9 @@ function LocationHelper(props: LocationHelperProps) {
     onLocationPowerStateChange,
   });
 
-  const locationStateChangeTimerInterval = useRef<NodeJS.Timeout>();
-  const locationModeChangeTimerInterval = useRef<NodeJS.Timeout>();
-  const locationUpdateTimerInterval = useRef<NodeJS.Timeout>();
+  const locationStateChangeTimerInterval = useRef<NodeJS.Timeout>(undefined);
+  const locationModeChangeTimerInterval = useRef<NodeJS.Timeout>(undefined);
+  const locationUpdateTimerInterval = useRef<NodeJS.Timeout>(undefined);
 
   const [isAuthorized, setIsAuthorized] = useState<boolean>(true);
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
@@ -145,8 +145,7 @@ function LocationHelper(props: LocationHelperProps) {
   }
 
   async function processLocationAuthorizationState() {
-    const status: LocationPermissionStatus =
-      await getLocationAuthorizationStatus();
+    const status: PermissionStatus = await getLocationAuthorizationStatus();
 
     onLocationStateChange(status);
   }
@@ -187,10 +186,10 @@ function LocationHelper(props: LocationHelperProps) {
     }
 
     if (Platform?.OS === 'ios') {
-      const authorization: LocationPermissionStatus =
+      const authorization: PermissionStatus =
         await getLocationAuthorizationStatus();
 
-      if (authorization === 'notDetermined') {
+      if (authorization !== 'granted') {
         requestLocationAuthorization();
         return;
       }
@@ -243,8 +242,8 @@ function LocationHelper(props: LocationHelperProps) {
     console.error('On get current location Error: ', error?.message);
   }
 
-  function onRequestLocationAuthorizationSucces(success: boolean) {
-    console.log('onRequestLocationAuthorizationSucces: ', success);
+  function onRequestLocationAuthorizationSuccess(success: boolean) {
+    console.info('onRequestLocationAuthorizationSuccess: ', success);
   }
 
   function onRequestLocationAuthorizationError(
@@ -261,40 +260,48 @@ function LocationHelper(props: LocationHelperProps) {
     console.error('On location watch Error: ', error?.message);
   }
 
-  function onLocationStateChange(status: LocationPermissionStatus) {
-    switch (status) {
-      case 'authorizedAlways':
-        setIsAuthorized(true);
-        break;
-
-      case 'authorizedWhenInUse':
-        setIsAuthorized(true);
-        break;
-
-      case 'authorizedFine':
-        setIsAuthorized(true);
-        break;
-
-      case 'authorizedCoarse':
-        setIsAuthorized(true);
-        break;
-
-      case 'denied':
-        setIsAuthorized(false);
-        break;
-
-      case 'restricted':
-        setIsAuthorized(false);
-        break;
-
-      case 'notDetermined':
-        setIsAuthorized(false);
-        break;
-
-      default:
-        console.warn('Location authorization out of scope: ', { status });
-        break;
+  function onLocationStateChange(status: PermissionStatus) {
+    if (status !== 'granted') {
+      setIsAuthorized(false);
     }
+
+    if (status === 'granted') {
+      setIsAuthorized(true);
+    }
+
+    // switch (status) {
+    //   case 'authorizedAlways':
+    //     setIsAuthorized(true);
+    //     break;
+
+    //   case 'authorizedWhenInUse':
+    //     setIsAuthorized(true);
+    //     break;
+
+    //   case 'authorizedFine':
+    //     setIsAuthorized(true);
+    //     break;
+
+    //   case 'authorizedCoarse':
+    //     setIsAuthorized(true);
+    //     break;
+
+    //   case 'denied':
+    //     setIsAuthorized(false);
+    //     break;
+
+    //   case 'restricted':
+    //     setIsAuthorized(false);
+    //     break;
+
+    //   case 'notDetermined':
+    //     setIsAuthorized(false);
+    //     break;
+
+    //   default:
+    //     console.warn('Location authorization out of scope: ', { status });
+    //     break;
+    // }
   }
 
   function startLocationUpdateListener() {

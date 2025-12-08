@@ -1,28 +1,32 @@
 import { useEffect, useRef } from 'react';
-import type { MutableRefObject } from 'react';
-import RNLocation from 'react-native-location';
-import type {
-  LocationPermissionStatus,
-  Subscription,
-} from 'react-native-location';
+import {
+  check,
+  PERMISSIONS,
+  // RESULTS,
+  // request
+} from 'react-native-permissions';
+
+import type { RefObject } from 'react';
+import type { PermissionStatus } from 'react-native-permissions';
+import { Platform } from 'react-native';
 
 interface UseLocationAuthorizationReturns {
   configureLocation: () => Promise<void>;
-  getLocationAuthorizationStatus: () => Promise<LocationPermissionStatus>;
+  getLocationAuthorizationStatus: () => Promise<PermissionStatus>;
   startLocationAuthorizationUpdateListener: () => void;
   stopLocationAuthorizationUpdateListener: () => void;
 }
 
 interface UseLocationAuthorizationProps {
-  onLocationStateChange: (status: LocationPermissionStatus) => void;
+  onLocationStateChange: (status: PermissionStatus) => void;
 }
 
 function useLocationAuthorization(
   props: UseLocationAuthorizationProps
 ): UseLocationAuthorizationReturns {
-  const locationAuthorizationListener: MutableRefObject<
-    Subscription | undefined
-  > = useRef<Subscription>();
+  const locationAuthorizationListenerRef: RefObject<
+    NodeJS.Timeout | undefined
+  > = useRef<NodeJS.Timeout>(undefined);
 
   useEffect(() => {
     mount();
@@ -43,28 +47,40 @@ function useLocationAuthorization(
     startLocationAuthorizationUpdateListener();
   }
 
-  async function configureLocation(): Promise<void> {
-    await RNLocation.configure({});
+  async function configureLocation(): Promise<void> {}
+
+  async function isLocationAuthorized(): Promise<PermissionStatus> {
+    let permissionResult;
+
+    if (Platform.OS === 'ios') {
+      permissionResult = await check(PERMISSIONS.IOS.LOCATION_WHEN_IN_USE);
+    } else {
+      permissionResult = await check(PERMISSIONS.ANDROID.ACCESS_FINE_LOCATION);
+    }
+
+    return permissionResult;
   }
 
-  async function getLocationAuthorizationStatus(): Promise<LocationPermissionStatus> {
-    const authorization = await RNLocation.getCurrentPermission();
+  async function getLocationAuthorizationStatus(): Promise<PermissionStatus> {
+    const authorization = await isLocationAuthorized();
 
     return authorization;
   }
 
   function startLocationAuthorizationUpdateListener() {
-    locationAuthorizationListener.current =
-      RNLocation?.subscribeToPermissionUpdates((authorization) => {
-        onLocationStateChange(authorization);
-      });
+    locationAuthorizationListenerRef.current = setInterval(async () => {
+      const authorization = await isLocationAuthorized();
+      onLocationStateChange(authorization);
+    }, 3000);
   }
 
   function stopLocationAuthorizationUpdateListener() {
-    locationAuthorizationListener?.current?.();
+    if (locationAuthorizationListenerRef?.current) {
+      clearInterval(locationAuthorizationListenerRef.current);
+    }
   }
 
-  function onLocationStateChange(status: LocationPermissionStatus): void {
+  function onLocationStateChange(status: PermissionStatus): void {
     props?.onLocationStateChange(status);
   }
 

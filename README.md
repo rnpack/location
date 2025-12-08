@@ -4,28 +4,35 @@ Location permissions and adapter state
 
 ## Installation
 
+
 ```sh
-npm install @rnpack/location
+npm install @rnpack/location react-native-nitro-modules
+
+> `react-native-nitro-modules` is required as this library relies on [Nitro Modules](https://nitro.margelo.com/).
 ```
 
-## Required dependencies
-```sh
-npm i @react-native-community/geolocation @rnpack/utils react-native-design react-native-location react-native-system-setting react-native-vector-icons
-```
 
 ## Usage
 
+
 ```js
-import {} from '@rnpack/location';
+import { multiply } from '@rnpack/location';
+
+// ...
+
+const result = multiply(3, 7);
 ```
+
 
 ## Contributing
 
-See the [contributing guide](CONTRIBUTING.md) to learn how to contribute to the repository and the development workflow.
+- [Development workflow](CONTRIBUTING.md#development-workflow)
+- [Sending a pull request](CONTRIBUTING.md#sending-a-pull-request)
+- [Code of conduct](CODE_OF_CONDUCT.md)
 
 ## License
 
-The MIT License.
+MIT
 
 ## Author
 
@@ -46,6 +53,9 @@ The MIT License.
 
 Thank you to all our sponsors! [Become a sponsor](https://opencollective.com/rnpack#sponsor) and get your image on our README on GitHub.
 
-<a href="https://opencollective.com/rnpack#sponsors" target="_blank"><img src="https://opencollective.com/rnpack/sponsors.svg?width=890" alt="@react-native-ui-design/dialog"></a>
+<a href="https://opencollective.com/rnpack#sponsors" target="_blank"><img src="https://opencollective.com/rnpack/sponsors.svg?width=890" alt="rnpack"></a>
+
 
 ---
+
+Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)

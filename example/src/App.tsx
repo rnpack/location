@@ -4,11 +4,13 @@ import { colors, Text, DesignProvider } from 'react-native-design';
 
 import type { GeolocationResponse } from '@react-native-community/geolocation';
 
-import { LocationHelper } from '@rnpack/location';
+import { LocationHelper, multiply } from '@rnpack/location';
 
 import { locationConfig } from './configs';
 
 export default function App() {
+  const result = multiply(3, 7);
+
   const [isAuthorized, setIsAuthorized] = useState<boolean>(true);
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [location, setLocation] = useState<GeolocationResponse>();
@@ -41,6 +43,10 @@ export default function App() {
         </Text>
         <Text>Location Mode: {isEnabled ? 'On' : 'Off'}</Text>
         <Text>Location: {JSON.stringify(location)}</Text>
+
+        <View style={styles.resultContainer}>
+          <Text>Result: {result}</Text>
+        </View>
       </View>
       <LocationHelper
         locationConfig={locationConfig}
@@ -73,6 +79,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: colors?.white?.normal?.main,
+  },
+  resultContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
