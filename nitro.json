@@ -1,16 +1,15 @@
 {
   "cxxNamespace": [
-    "RNPackLocation"
+    "rnpacklocation"
   ],
   "ios": {
     "iosModuleName": "RNPackLocation"
   },
   "android": {
     "androidNamespace": [
-      "rnpack",
-      "location"
+      "rnpacklocation"
     ],
-    "androidCxxLibName": "RNPackLocation"
+    "androidCxxLibName": "rnpacklocation"
   },
   "autolinking": {
     "RNPackLocation": {

@@ -22,7 +22,7 @@ def reactNativeArchitectures() {
 
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
-apply from: '../nitrogen/generated/android/RNPackLocation+autolinking.gradle'
+apply from: '../nitrogen/generated/android/rnpacklocation+autolinking.gradle'
 
 apply plugin: "com.facebook.react"
 
@@ -31,7 +31,7 @@ def getExtOrIntegerDefault(name) {
 }
 
 android {
-  namespace "com.margelo.nitro.rnpack.location"
+  namespace "com.margelo.nitro.rnpacklocation"
 
   compileSdkVersion getExtOrIntegerDefault("compileSdkVersion")
 

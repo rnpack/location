@@ -8,9 +8,9 @@ import { LocationHelper, multiply } from '@rnpack/location';
 
 import { locationConfig } from './configs';
 
-export default function App() {
-  const result = multiply(3, 7);
+const result = multiply(3, 7);
 
+export default function App() {
   const [isAuthorized, setIsAuthorized] = useState<boolean>(true);
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
   const [location, setLocation] = useState<GeolocationResponse>();
@@ -69,7 +69,7 @@ export default function App() {
           </Text>
         }
         onLocationAdapterStateChange={onLocationAdapterStateChange}
-        timeInterval={30000}
+        timeInterval={8000}
       />
     </DesignProvider>
   );

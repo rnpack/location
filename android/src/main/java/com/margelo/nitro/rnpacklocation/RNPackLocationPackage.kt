@@ -1,4 +1,4 @@
-package com.margelo.nitro.rnpack.location
+package com.margelo.nitro.rnpacklocation
 
 import com.facebook.react.BaseReactPackage
 import com.facebook.react.bridge.NativeModule
@@ -16,7 +16,7 @@ class RNPackLocationPackage : BaseReactPackage() {
 
     companion object {
         init {
-            System.loadLibrary("RNPackLocation")
+            System.loadLibrary("rnpacklocation")
         }
     }
 }

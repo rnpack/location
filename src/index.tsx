@@ -1,5 +1,5 @@
 import { NitroModules } from 'react-native-nitro-modules';
-import type { RNPackLocation } from './Location.nitro';
+import type { RNPackLocation } from './RNPackLocation.nitro';
 
 const RNPackLocationHybridObject =
   NitroModules.createHybridObject<RNPackLocation>('RNPackLocation');

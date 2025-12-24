@@ -1,6 +1,6 @@
 #include <jni.h>
-#include "RNPackLocationOnLoad.hpp"
+#include "rnpacklocationOnLoad.hpp"
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*) {
-  return margelo::nitro::RNPackLocation::initialize(vm);
+  return margelo::nitro::rnpacklocation::initialize(vm);
 }

@@ -1,4 +1,4 @@
-package rnpack.location.example
+package rnpacklocation.example
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

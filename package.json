@@ -40,8 +40,8 @@
     "nitrogen": "nitrogen",
     "typecheck": "tsc",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "release": "release-it",
-    "test": "jest"
+    "test": "jest",
+    "release": "release-it"
   },
   "keywords": [
     "react-native",
@@ -52,7 +52,7 @@
     "type": "git",
     "url": "git+https://github.com/rnpack/location.git"
   },
-  "author": "Abiraman K <abiramancit@gmail.com> (https://abiramank.github.io/)",
+  "author": "Abiraman K <abiramancit@gmail.com> (https://abiramank.github.io)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/rnpack/location/issues"
@@ -68,12 +68,13 @@
     "@eslint/js": "^9.35.0",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-native-community/geolocation": "^3.4.0",
-    "@react-native/babel-preset": "0.81.1",
-    "@react-native/eslint-config": "^0.81.1",
+    "@react-native/babel-preset": "0.83.0",
+    "@react-native/eslint-config": "0.83.0",
     "@release-it/conventional-changelog": "^10.0.1",
-    "@rnpack/utils": "^0.1.12",
+    "@rnpack/utils": "^0.1.14",
     "@types/jest": "^29.5.14",
-    "@types/react": "^19.1.0",
+    "@types/react": "^19.2.0",
+    "buffer": "^6.0.3",
     "commitlint": "^19.8.1",
     "del-cli": "^6.0.0",
     "eslint": "^9.35.0",
@@ -84,15 +85,15 @@
     "moti": "^0.30.0",
     "nitrogen": "^0.31.10",
     "prettier": "^2.8.8",
-    "react": "19.1.0",
-    "react-native": "0.81.1",
+    "react": "19.2.0",
+    "react-native": "0.83.0",
     "react-native-autocomplete-dropdown": "^5.0.0",
-    "react-native-builder-bob": "^0.40.16",
-    "react-native-design": "^0.1.15",
-    "react-native-gesture-handler": "^2.29.1",
+    "react-native-builder-bob": "^0.40.17",
+    "react-native-design": "^0.1.16",
+    "react-native-gesture-handler": "^2.30.0",
     "react-native-nitro-modules": "^0.31.10",
     "react-native-permissions": "^5.4.4",
-    "react-native-reanimated": "^4.2.0",
+    "react-native-reanimated": "^4.2.1",
     "react-native-svg": "^15.15.1",
     "react-native-system-setting": "^1.7.6",
     "react-native-vector-icons": "^10.3.0",
@@ -105,6 +106,7 @@
     "@react-native-async-storage/async-storage": "*",
     "@react-native-community/geolocation": "*",
     "@rnpack/utils": "*",
+    "buffer": "*",
     "moti": "*",
     "react": "*",
     "react-native": "*",
@@ -155,6 +157,13 @@
     "trailingComma": "es5",
     "useTabs": false
   },
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/example/node_modules",
+      "<rootDir>/lib/"
+    ]
+  },
   "commitlint": {
     "extends": [
       "@commitlint/config-conventional"
@@ -179,30 +188,23 @@
       }
     }
   },
-  "jest": {
-    "preset": "react-native",
-    "modulePathIgnorePatterns": [
-      "<rootDir>/example/node_modules",
-      "<rootDir>/lib/"
-    ]
-  },
   "create-react-native-library": {
-    "languages": "kotlin-swift",
     "type": "nitro-module",
+    "languages": "kotlin-swift",
     "tools": [
       "eslint",
+      "jest",
       "lefthook",
-      "release-it",
-      "jest"
+      "release-it"
     ],
-    "version": "0.55.1"
+    "version": "0.56.0"
   },
   "codegenConfig": {
-    "name": "RNPackLocationSpec",
+    "name": "RNPackLocation",
     "type": "modules",
     "jsSrcsDir": "src",
     "android": {
-      "javaPackageName": "com.margelo.nitro.rnpack.location"
+      "javaPackageName": "com.margelo.nitro.rnpacklocation"
     }
   }
 }

@@ -11,6 +11,12 @@ npm install @rnpack/location react-native-nitro-modules
 > `react-native-nitro-modules` is required as this library relies on [Nitro Modules](https://nitro.margelo.com/).
 ```
 
+## Required dependencies
+
+```sh
+yarn add @react-native-community/geolocation react-native-permissions react-native-system-setting react-native-design @react-native-async-storage/async-storage moti react-native-autocomplete-dropdown react-native-gesture-handler react-native-svg react-native-vector-icons react-native-reanimated react-native-worklets @rnpack/utils buffer
+```
+
 
 ## Usage
 
@@ -42,7 +48,7 @@ MIT
       <img src="https://avatars.githubusercontent.com/u/41302126?v=4" width="64" height="64" alt="Abiraman K">
     </td>
     <td>
-      <a href="https://github.com/AbiramanK" target="_blank">Abiraman K</a>
+      <a href="https://abiramank.github.io" target="_blank">Abiraman K</a>
     </td>
   </tr>
 </table>
@@ -57,5 +63,3 @@ Thank you to all our sponsors! [Become a sponsor](https://opencollective.com/rnp
 
 
 ---
-
-Made with [create-react-native-library](https://github.com/callstack/react-native-builder-bob)

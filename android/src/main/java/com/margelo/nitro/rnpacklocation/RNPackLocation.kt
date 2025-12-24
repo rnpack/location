@@ -1,4 +1,4 @@
-package com.margelo.nitro.rnpack.location
+package com.margelo.nitro.rnpacklocation
   
 import com.facebook.proguard.annotations.DoNotStrip
 
