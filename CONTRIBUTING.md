@@ -21,28 +21,13 @@ yarn
 
 > Since the project relies on Yarn workspaces, you cannot use [`npm`](https://github.com/npm/cli) for development without manually migrating.
 
-This project uses Nitro Modules. If you're not familiar with how Nitro works, make sure to check the [Nitro Modules Docs](https://nitro.margelo.com/).
-
-You need to run [Nitrogen](https://nitro.margelo.com/docs/nitrogen) to generate the boilerplate code required for this project. The example app will not build without this step.
-
-Run **Nitrogen** in following cases:
-
-- When you make changes to any `*.nitro.ts` files.
-- When running the project for the first time (since the generated files are not committed to the repository).
-
-To invoke **Nitrogen**, use the following command:
-
-```sh
-yarn nitrogen
-```
-
 The [example app](/example/) demonstrates usage of the library. You need to run it to test any changes you make.
 
 It is configured to use the local version of the library, so any changes you make to the library's source code will be reflected in the example app. Changes to the library's JavaScript code will be reflected in the example app without a rebuild, but native code changes will require a rebuild of the example app.
 
-If you want to use Android Studio or Xcode to edit the native code, you can open the `example/android` or `example/ios` directories respectively in those editors. To edit the Objective-C or Swift files, open `example/ios/RNPackLocationExample.xcworkspace` in Xcode and find the source files at `Pods > Development Pods > @rnpack/location`.
+If you want to use Android Studio or Xcode to edit the native code, you can open the `example/android` or `example/ios` directories respectively in those editors. To edit the Objective-C or Swift files, open `example/ios/LocationExample.xcworkspace` in Xcode and find the source files at `Pods > Development Pods > @rnpack/location`.
 
-To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `@rnpack/location` under `Android`.
+To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `rnpack-location` under `Android`.
 
 You can use various commands from the root directory to work with the project.
 
@@ -67,10 +52,16 @@ yarn example ios
 To confirm that the app is running with the new architecture, you can check the Metro logs for a message like this:
 
 ```sh
-Running "RNPackLocationExample" with {"fabric":true,"initialProps":{"concurrentRoot":true},"rootTag":1}
+Running "LocationExample" with {"fabric":true,"initialProps":{"concurrentRoot":true},"rootTag":1}
 ```
 
 Note the `"fabric":true` and `"concurrentRoot":true` properties.
+
+To run the example app on Web:
+
+```sh
+yarn example web
+```
 
 Make sure your code passes TypeScript:
 
@@ -128,12 +119,14 @@ The `package.json` file contains various scripts for common tasks:
 
 - `yarn`: setup project by installing dependencies.
 - `yarn typecheck`: type-check files with TypeScript.
-- `yarn lint`: lint files with [ESLint](https://eslint.org/).
-- `yarn test`: run unit tests with [Jest](https://jestjs.io/).
-- `yarn example start`: start the Metro server for the example app.
+  - `yarn lint`: lint files with [ESLint](https://eslint.org/).
+    - `yarn test`: run unit tests with [Jest](https://jestjs.io/).
+  - `yarn example start`: start the Metro server for the example app.
 - `yarn example android`: run the example app on Android.
 - `yarn example ios`: run the example app on iOS.
-
+  - `yarn example web`: run the example app on Web.
+- `yarn example build:web`: build the example app for Web.
+  
 ### Sending a pull request
 
 > **Working on your first pull request?** You can learn how from this _free_ series: [How to Contribute to an Open Source Project on GitHub](https://app.egghead.io/playlists/how-to-contribute-to-an-open-source-project-on-github).

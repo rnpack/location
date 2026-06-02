@@ -1,77 +1,263 @@
-import { useState, useEffect } from 'react';
-import { StyleSheet, View } from 'react-native';
-import { colors, Text, DesignProvider } from 'react-native-design';
+import { useEffect, useRef, useState } from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  Button,
+  ScrollView,
+  Platform,
+} from 'react-native';
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
-import type { GeolocationResponse } from '@react-native-community/geolocation';
+import type { EventSubscription } from 'react-native';
 
-import { LocationHelper, multiply } from '@rnpack/location';
+import {
+  isLocationEnabled,
+  isLocationAuthorized,
+  onLocationProvidersChange,
+  subscribeToLocationProvidersChange,
+  unsubscribeFromLocationProvidersChange,
+  subscribeToLocationPermissionsChange,
+  unsubscribeFromLocationPermissionsChange,
+  onLocationPermissionsChange,
+  openLocationProvidersSettings,
+  openLocationPermissionsSettings,
+  getCurrentLocation,
+  getLastLocation,
+  getFreshCurrentLocation,
+  subscribeToLocationChange,
+  unsubscribeFromLocationChange,
+  onLocationChange,
+  LocationPriority,
+  startLocationBackgroundService,
+  requestLocationPermission,
+  requestBackgroundLocationPermission,
+  stopLocationBackgroundService,
+  configureBackgroundLocation,
+  onBackgroundLocationChange,
+} from '@rnpack/location';
 
-import { locationConfig } from './configs';
+import type {
+  LocationResponse,
+  LocationAuthorizedResponse,
+} from '@rnpack/location';
+import { ForegroundServiceLocationApp } from './ForegroundLocationApp';
 
-const result = multiply(3, 7);
+const isIos = Platform.OS === 'ios';
 
 export default function App() {
-  const [isAuthorized, setIsAuthorized] = useState<boolean>(true);
-  const [isEnabled, setIsEnabled] = useState<boolean>(true);
-  const [location, setLocation] = useState<GeolocationResponse>();
+  return (
+    <SafeAreaProvider>
+      <Main />
+    </SafeAreaProvider>
+  );
+}
+
+function Main() {
+  const onLocationProvidersChangeSubscriptionRef =
+    useRef<null | EventSubscription>(null);
+  const onLocationPermissionsChangeSubscriptionRef =
+    useRef<null | EventSubscription>(null);
+  const onLocationChangeSubscriptionRef = useRef<null | EventSubscription>(
+    null
+  );
+  const onBackgroundLocationChangeSubscriptionRef =
+    useRef<null | EventSubscription>(null);
+
+  const [locationOn, setLocationOn] = useState<boolean>(false);
+  const [locationAuthorized, setLocationAuthorized] =
+    useState<LocationAuthorizedResponse>();
+  const [lastLocation, setLastLocation] = useState<LocationResponse>();
+  const [isGettingLastLocation, setIsGettingLastLocation] =
+    useState<boolean>(false);
+  const [currentLocation, setCurrentLocation] = useState<LocationResponse>();
+  const [isGettingCurrentLocation, setIsGettingCurrentLocation] =
+    useState<boolean>(false);
+  const [freshCurrentLocation, setFreshCurrentLocation] =
+    useState<LocationResponse>();
+  const [isGettingFreshCurrentLocation, setIsGettingFreshCurrentLocation] =
+    useState<boolean>(false);
+  const [locationUpdate, setLocationUpdate] = useState<LocationResponse>();
+  const [backgroundLocationUpdate, setBackgroundLocationUpdate] =
+    useState<LocationResponse>();
 
   useEffect(() => {
-    mount();
+    const __isOn = isLocationEnabled();
+    setLocationOn(__isOn);
+
+    const authorizedResult = isLocationAuthorized();
+    setLocationAuthorized(authorizedResult);
+
+    configureBackgroundLocation({
+      url: 'https://webhook.site/96fc0d5e-3027-42c5-a67a-661c1b0462b0',
+    });
+
+    onLocationProvidersChangeSubscriptionRef.current =
+      onLocationProvidersChange((isOn) => {
+        setLocationOn(isOn);
+      });
+
+    onLocationPermissionsChangeSubscriptionRef.current =
+      onLocationPermissionsChange((result) => {
+        setLocationAuthorized(result);
+      });
+
+    onLocationChangeSubscriptionRef.current = onLocationChange((result) => {
+      setLocationUpdate(result);
+    });
+
+    if (isIos) {
+      onBackgroundLocationChangeSubscriptionRef.current =
+        onBackgroundLocationChange((result) => {
+          setBackgroundLocationUpdate(result);
+        });
+    }
+
+    subscribeToLocationProvidersChange();
+
+    subscribeToLocationPermissionsChange();
+
+    subscribeToLocationChange();
+
+    return () => {
+      onLocationProvidersChangeSubscriptionRef.current?.remove();
+      onLocationPermissionsChangeSubscriptionRef.current?.remove();
+
+      if (isIos) {
+        onBackgroundLocationChangeSubscriptionRef.current?.remove();
+      }
+
+      unsubscribeFromLocationProvidersChange();
+      unsubscribeFromLocationPermissionsChange();
+      unsubscribeFromLocationChange();
+    };
   }, []);
 
-  function mount(): void {}
+  useEffect(() => {
+    console.log('isOn: ', locationOn);
+  }, [locationOn]);
 
-  function onLocationChange(_location: GeolocationResponse) {
-    console.info('Calling location change: ', _location);
-    setLocation(_location);
+  async function accessLastLocation() {
+    try {
+      setIsGettingLastLocation(true);
+
+      const location = await getLastLocation();
+
+      setLastLocation(location);
+    } finally {
+      setIsGettingLastLocation(false);
+    }
   }
 
-  function onLocationAuthorizationChange(_isAuthorized: boolean) {
-    setIsAuthorized(_isAuthorized);
+  async function accessCurrentLocation() {
+    try {
+      setIsGettingCurrentLocation(true);
+
+      const location = await getCurrentLocation();
+
+      setCurrentLocation(location);
+    } finally {
+      setIsGettingCurrentLocation(false);
+    }
   }
 
-  function onLocationAdapterStateChange(_isEnabled: boolean) {
-    setIsEnabled(_isEnabled);
+  async function accessFreshCurrentLocation() {
+    try {
+      setIsGettingFreshCurrentLocation(true);
+
+      const location = await getFreshCurrentLocation(
+        LocationPriority.PRIORITY_HIGH_ACCURACY
+      );
+
+      setFreshCurrentLocation(location);
+    } finally {
+      setIsGettingFreshCurrentLocation(false);
+    }
   }
+
+  const safeAreaInsets = useSafeAreaInsets();
 
   return (
-    <DesignProvider>
-      <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingTop: safeAreaInsets.top,
+          paddingBottom: safeAreaInsets.bottom,
+        },
+      ]}
+    >
+      <ScrollView style={styles.content}>
+        <Text>Location: {locationOn ? 'ON' : 'OFF'}</Text>
         <Text>
-          Location Authorization:{' '}
-          {isAuthorized ? 'Authorized' : 'Not Authorized'}
+          Location Authorized Coarse:{' '}
+          {locationAuthorized?.coarse ? 'ON' : 'OFF'}
         </Text>
-        <Text>Location Mode: {isEnabled ? 'On' : 'Off'}</Text>
-        <Text>Location: {JSON.stringify(location)}</Text>
+        <Text>
+          Location Authorized Fine: {locationAuthorized?.fine ? 'ON' : 'OFF'}
+        </Text>
+        <Text>Location Authorized iOS: {locationAuthorized?.iosStatus}</Text>
 
-        <View style={styles.resultContainer}>
-          <Text>Result: {result}</Text>
+        <View style={styles.buttonContainer}>
+          <Button
+            title="Request Location Permission"
+            onPress={requestLocationPermission}
+          />
+          <Button
+            title="Request Background Location Permission"
+            onPress={requestBackgroundLocationPermission}
+          />
+          <Button
+            title="Open Location Providers Settings"
+            onPress={openLocationProvidersSettings}
+          />
+          <Button
+            title="Open Location Permission Settings"
+            onPress={openLocationPermissionsSettings}
+          />
+          <Button
+            title="Get Last Location"
+            onPress={accessLastLocation}
+            disabled={isGettingLastLocation}
+          />
+          <Button
+            title="Get Current Location"
+            onPress={accessCurrentLocation}
+            disabled={isGettingCurrentLocation}
+          />
+          <Button
+            title="Get Fresh Current Location"
+            onPress={accessFreshCurrentLocation}
+            disabled={isGettingFreshCurrentLocation}
+          />
+          <Button
+            title="Start Location Background Service"
+            onPress={startLocationBackgroundService}
+          />
+          <Button
+            title="Stop Location Background Service"
+            onPress={stopLocationBackgroundService}
+          />
         </View>
-      </View>
-      <LocationHelper
-        locationConfig={locationConfig}
-        onLocationChange={onLocationChange}
-        locationAuthorizationTitle="Allow Location Authorization"
-        locationAuthorizationAcceptText="Allow"
-        locationAuthorizationContent={
-          <Text variant="label">
-            Location authorization is required to check location permissions and
-            adapter state. Please authorize the location.
+        <Text>Last Location: {JSON.stringify(lastLocation)}</Text>
+        <Text>Current Location: {JSON.stringify(currentLocation)}</Text>
+        <Text>
+          Fresh Current Location: {JSON.stringify(freshCurrentLocation)}
+        </Text>
+        <Text>Current Location Listener: {JSON.stringify(locationUpdate)}</Text>
+        {isIos && (
+          <Text>
+            Background Location Listener:{' '}
+            {JSON.stringify(backgroundLocationUpdate)}
           </Text>
-        }
-        onLocationAuthorizationChange={onLocationAuthorizationChange}
-        enableLocationTitle="Enable Location"
-        enableLocationAcceptText="Enable"
-        enableLocationContent={
-          <Text variant="label">
-            Location is required to check location permissions and adapter
-            state. Please enable the location.
-          </Text>
-        }
-        onLocationAdapterStateChange={onLocationAdapterStateChange}
-        timeInterval={8000}
-      />
-    </DesignProvider>
+        )}
+
+        {Platform.OS === 'android' && <ForegroundServiceLocationApp />}
+      </ScrollView>
+    </View>
   );
 }
 
@@ -80,10 +266,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors?.white?.normal?.main,
+    backgroundColor: '#FFFFFF',
+    rowGap: 4,
   },
-  resultContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+  content: {
+    flexGrow: 1,
+  },
+  buttonContainer: {
+    rowGap: 8,
   },
 });
