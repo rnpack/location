@@ -150,6 +150,7 @@ class RNPackLocationImpl : RNPackLocation {
     val isCoarse: Boolean = isLocationAuthorizedCoarse(reactApplicationContext)
 
     return LocationAccessPermissionResult(
+      status = isFine || isCoarse,
       fine = isFine,
       coarse = isCoarse
     )

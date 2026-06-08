@@ -34,6 +34,7 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
 import com.rnpack.location.data.BackgroundLocationConfiguration
+import com.rnpack.location.data.LocationAccessPermissionResult
 import com.rnpack.location.data.LocationConfiguration
 import com.rnpack.location.dtos.LocationDTO
 import com.rnpack.location.services.BackgroundLocationWorker
@@ -167,12 +168,13 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
   override fun isLocationAuthorized(): WritableMap {
     val result = rnPackLocation.isLocationAuthorized(reactApplicationContext)
 
-    val access: WritableMap = WritableNativeMap()
+    val locationAccessPermissionResult = LocationAccessPermissionResult(
+      status = result.fine || result.coarse,
+      fine = result.fine,
+      coarse = result.coarse
+    )
 
-    access.putBoolean("fine", result.fine)
-    access.putBoolean("coarse", result.coarse)
-
-    return access
+    return locationAccessPermissionResult.toWritableMap()
   }
 
   @RequiresPermission(anyOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
