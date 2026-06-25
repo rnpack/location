@@ -33,6 +33,7 @@ jobs:
 
     permissions:
       contents: write
+      id-token: write
 
     steps:
       - name: Checkout
@@ -48,9 +49,6 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Authenticate with NPM
-        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
-
       - name: Build package
         run: yarn prepare
 
@@ -64,7 +62,6 @@ jobs:
           fi
 
       - name: Run release-it
-        run: yarn release ${{ steps.release_type.outputs.type }} --ci
+        run: yarn release ${{ steps.release_type.outputs.type }} --ci --npm.skipChecks
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
