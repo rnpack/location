@@ -19,6 +19,7 @@ NSString * const kLocationResponseKeyLongitude =@"longitude";
 NSString * const kLocationResponseKeyAltitude   =@"altitude";
 NSString * const kLocationResponseKeyAccuracy  =@"accuracy";
 NSString * const kLocationResponseKeyTimestamp  =@"timestamp";
+NSString * const kLocationResponseKeyIsMocked  =@"isMocked";
 
 int locationProviderChangeListenerCount = 0;
 int locationPermissionChangeListenerCount = 0;
@@ -40,7 +41,8 @@ NSDictionary *locationUpdate = @{
   kLocationResponseKeyLongitude: [NSNull null],
   kLocationResponseKeyAltitude: [NSNull null],
   kLocationResponseKeyAccuracy: [NSNull null],
-  kLocationResponseKeyTimestamp: [NSNull null]
+  kLocationResponseKeyTimestamp: [NSNull null],
+  kLocationResponseKeyIsMocked: [NSNull null]
 };
 
 - (instancetype) init {
@@ -70,7 +72,7 @@ NSDictionary *locationUpdate = @{
   
   NSDictionary *access = self.isLocationAuthorized;
   
-  [self emitOnLocationPermissionsChange:access]; 
+  [self emitOnLocationPermissionsChange:access];
 }
 
 -(void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray<CLLocation *> *)locations {
@@ -87,6 +89,8 @@ NSDictionary *locationUpdate = @{
       // Convert native NSDate timestamp to milliseconds unix epoch interval for JavaScript
       NSTimeInterval timestampInMs = [location.timestamp timeIntervalSince1970] * 1000;
       locationRes[kLocationResponseKeyTimestamp] = @(timestampInMs);
+      
+      locationRes[kLocationResponseKeyIsMocked] = @([self isMockedLocation]);
       
       if(locationChangeListenerCount > 0) {
         [self emitOnLocationChange:locationRes];
@@ -126,7 +130,7 @@ NSDictionary *locationUpdate = @{
 
 - (void)requestLocationPermission {
   NSDictionary *auth = self.isLocationAuthorized;
-
+  
   if(auth[kLocationKeyIosStatus] == kLocationKeyNotDetermined) {
     [self.locationManager requestAlwaysAuthorization];
   }
@@ -335,13 +339,13 @@ NSDictionary *locationUpdate = @{
   }
 }
 
-- (void)startLocationForegroundService { 
+- (void)startLocationForegroundService {
 }
 
-- (void)stopLocationForegroundService { 
+- (void)stopLocationForegroundService {
 }
 
-- (void)wakeUpApp { 
+- (void)wakeUpApp {
 }
 
 - (void)configureBackgroundLocation:(JS::NativeRNPackLocation::BackgroundLocationConfiguration &)config {
@@ -354,6 +358,35 @@ NSDictionary *locationUpdate = @{
 
 - (void)requestBackgroundLocationPermission {
 }
+
+- (Boolean)isMockedLocation {
+  CLLocationManager *locationManager = [[CLLocationManager alloc] init];
+  CLLocation *location = locationManager.location;
+  
+  bool isMocked = false;
+  
+  if(@available(iOS 15.0, *)) {
+    CLLocationSourceInformation *sourceInfo = location.sourceInformation;
+    
+    if(sourceInfo.isSimulatedBySoftware) {
+      isMocked = true;
+    }
+  } else {
+    if(location.horizontalAccuracy == 0.0 || location.verticalAccuracy == 0.0) {
+      isMocked = true;
+    } else if (fabs(location.coordinate.latitude - 37.33182) < 0.00001 &&
+               fabs(location.coordinate.longitude - (-122.03118)) < 0.00001) {
+      isMocked = true;
+    }
+  }
+  
+  return isMocked;
+}
+
+- (void)isLocationMocked:(nonnull RCTPromiseResolveBlock)resolve reject:(nonnull RCTPromiseRejectBlock)reject {
+  resolve(@([self isMockedLocation]));
+}
+
 
 - (void)initialize {
 }
