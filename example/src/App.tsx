@@ -38,6 +38,7 @@ import {
   stopLocationBackgroundService,
   configureBackgroundLocation,
   onBackgroundLocationChange,
+  isLocationMocked,
 } from '@rnpack/location';
 
 import type {
@@ -45,6 +46,7 @@ import type {
   LocationAuthorizedResponse,
 } from '@rnpack/location';
 import { ForegroundServiceLocationApp } from './ForegroundLocationApp';
+import { BackgroundLocationLogApi } from './constants';
 
 const isIos = Platform.OS === 'ios';
 
@@ -83,6 +85,7 @@ function Main() {
   const [locationUpdate, setLocationUpdate] = useState<LocationResponse>();
   const [backgroundLocationUpdate, setBackgroundLocationUpdate] =
     useState<LocationResponse>();
+  const [isMockedLocation, setIsMockedLocation] = useState<boolean>(false);
 
   useEffect(() => {
     const __isOn = isLocationEnabled();
@@ -92,7 +95,7 @@ function Main() {
     setLocationAuthorized(authorizedResult);
 
     configureBackgroundLocation({
-      url: 'https://webhook.site/96fc0d5e-3027-42c5-a67a-661c1b0462b0',
+      url: BackgroundLocationLogApi,
     });
 
     onLocationProvidersChangeSubscriptionRef.current =
@@ -178,6 +181,12 @@ function Main() {
     }
   }
 
+  async function onPressIsLocaitonMocked() {
+    const isMocked = await isLocationMocked();
+
+    setIsMockedLocation(isMocked);
+  }
+
   const safeAreaInsets = useSafeAreaInsets();
 
   return (
@@ -241,7 +250,14 @@ function Main() {
             title="Stop Location Background Service"
             onPress={stopLocationBackgroundService}
           />
+          <Button
+            title="Is Location Mocked"
+            onPress={onPressIsLocaitonMocked}
+          />
         </View>
+        <Text>
+          Is Location Mocked: {isMockedLocation ? 'Mocked' : 'Not Mocked'}
+        </Text>
         <Text>Last Location: {JSON.stringify(lastLocation)}</Text>
         <Text>Current Location: {JSON.stringify(currentLocation)}</Text>
         <Text>

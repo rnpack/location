@@ -1,5 +1,5 @@
 import type { LocationResponse } from '@rnpack/location';
-import { LocationLogApi } from './constants';
+import { ForegroundLocationLogApi } from './constants';
 
 let updatesCount = 0;
 
@@ -9,7 +9,7 @@ export default async (taskData: LocationResponse) => {
     updatesCount,
   });
 
-  const response = await fetch(LocationLogApi, {
+  const response = await fetch(ForegroundLocationLogApi, {
     method: 'POST',
     body: JSON.stringify({
       ...taskData,
