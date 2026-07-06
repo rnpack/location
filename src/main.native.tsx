@@ -133,3 +133,7 @@ export function configureBackgroundLocation(
 ): void {
   NativeRNPackLocation.configureBackgroundLocation(config);
 }
+
+export async function isLocationMocked(): Promise<boolean> {
+  return await NativeRNPackLocation.isLocationMocked();
+}

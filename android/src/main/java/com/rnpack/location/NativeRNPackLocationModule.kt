@@ -289,9 +289,10 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
           val altitude = intent.getDoubleExtra(LocationDTO::altitude.name, 0.0)
           val accuracy = intent.getFloatExtra(LocationDTO::accuracy.name, 0F)
           val timestamp = intent.getLongExtra(LocationDTO::timestamp.name, 0L)
+          val isMocked = intent.getBooleanExtra(LocationDTO::isMocked.name, false)
 
           val locationDto = LocationDTO(
-            latitude, longitude, altitude, accuracy.toDouble(), timestamp
+            latitude, longitude, altitude, accuracy.toDouble(), timestamp, isMocked
           )
 
           Log.d(
@@ -483,6 +484,20 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
 
   override fun stopLocationBackgroundService() {
     workManager.cancelUniqueWork(BackgroundLocationWorker.WORK_NAME)
+  }
+
+  @RequiresPermission(anyOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+  override fun isLocationMocked(promise: Promise) {
+    rnPackLocation.getFreshCurrentLocation(
+      reactApplicationContext,
+      Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+      onSuccess = { location ->
+        val isMocked: Boolean = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) location.isMock else location.isFromMockProvider
+        promise.resolve(isMocked)
+      },
+      onError = { exception ->
+        promise.reject(exception)
+      })
   }
 
   companion object {

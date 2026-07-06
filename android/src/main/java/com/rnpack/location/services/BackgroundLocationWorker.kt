@@ -132,6 +132,7 @@ class BackgroundLocationWorker(context: Context, params: WorkerParameters) :
         putDouble(LocationDTO::altitude.name, location.altitude)
         putDouble(LocationDTO::accuracy.name, location.accuracy.toDouble())
         putLong(LocationDTO::timestamp.name, location.time)
+        putBoolean(LocationDTO::isMocked.name, location.isFromMockProvider)
       }
 
       // Direct intent execution targeting our custom LocationTaskService
@@ -156,6 +157,7 @@ class BackgroundLocationWorker(context: Context, params: WorkerParameters) :
       jsonObject.put(LocationDTO::altitude.name, location.altitude)
       jsonObject.put(LocationDTO::accuracy.name, location.accuracy.toDouble())
       jsonObject.put(LocationDTO::timestamp.name, location.time)
+      jsonObject.put(LocationDTO::isMocked.name, if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) location.isMock else location.isFromMockProvider)
 
       val body = jsonObject.toString().toRequestBody()
 

@@ -41,6 +41,7 @@ class LocationForegroundService : Service() {
         intent.putExtra(LocationDTO::altitude.name, location.altitude)
         intent.putExtra(LocationDTO::accuracy.name, location.accuracy)
         intent.putExtra(LocationDTO::timestamp.name, location.time)
+        intent.putExtra(LocationDTO::isMocked.name, if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) location.isMock else location.isFromMockProvider)
 
         intent.setPackage(packageName)
 
@@ -163,6 +164,7 @@ class LocationForegroundService : Service() {
       putDouble(LocationDTO::altitude.name, location.altitude)
       putDouble(LocationDTO::accuracy.name, location.accuracy)
       putLong(LocationDTO::timestamp.name, location.timestamp)
+      putBoolean(LocationDTO::isMocked.name, location.isMocked)
     }
 
     serviceIntent.putExtras(bundle)

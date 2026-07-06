@@ -26,6 +26,7 @@ export type LocationResponse = {
   altitude: number;
   accuracy: number;
   timestamp: number;
+  isMocked: boolean;
 };
 
 export enum LocationPriority {
@@ -98,6 +99,9 @@ export interface Spec extends TurboModule {
   startLocationBackgroundService(): void;
   stopLocationBackgroundService(): void;
   readonly onBackgroundLocationChange: CodegenTypes.EventEmitter<LocationResponse>;
+
+  // Mock
+  isLocationMocked(): Promise<boolean>;
 }
 
 export default TurboModuleRegistry.getEnforcing<Spec>('NativeRNPackLocation');
