@@ -1,6 +1,6 @@
 {
   "name": "@rnpack/location",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Location permissions and adapter state",
   "main": "./lib/module/index.js",
   "types": "./lib/typescript/src/index.d.ts",
