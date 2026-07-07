@@ -17,6 +17,7 @@ A high-performance location tracking and permissions management package for Reac
 - 🛡️ **Permission Management**: Easy-to-use API for requesting foreground and background permissions, plus helpers to open system settings directly.
 - 📱 **Android Foreground Service**: Run persistent foreground tracking with standard status-bar notifications (**Android Only**).
 - 🌌 **Background Location Sync**: Keep tracking and sync location data directly to your API endpoint in the background (iOS & Android).
+- 🕵️‍♂️ **Mock Location Detection**: Detect if the device's location is simulated/mocked via Mock Providers on Android or software simulation on iOS.
 
 ---
 
@@ -135,6 +136,7 @@ dependencies {
 | `getLastLocation()` | `Promise<LocationResponse>` | Both | Resolves the last cached location on the device. Faster and battery-friendly. |
 | `getCurrentLocation(priority?)` | `Promise<LocationResponse>` | Both | Requests a current location update based on the specified priority level. |
 | `getFreshCurrentLocation(priority?)` | `Promise<LocationResponse>` | Both | Bypasses caching and forces a fresh GPS fix from the hardware. |
+| `isLocationMocked()` | `Promise<boolean>` | Both | Checks if the current location is mocked/simulated (using Mock Provider on Android or software simulation on iOS). |
 | `openLocationProvidersSettings()` | `void` | Both | Directs the user to the device's system Location Provider settings. |
 | `openLocationPermissionsSettings()` | `void` | Both | Directs the user to the application's details screen to adjust permissions. |
 | `subscribeToLocationProvidersChange()` | `void` | Both | Begins monitoring changes in the system location provider status. |
@@ -167,6 +169,7 @@ type LocationResponse = {
   altitude: number;
   accuracy: number;
   timestamp: number;
+  isMocked: boolean;
 };
 ```
 
@@ -282,7 +285,7 @@ export default function App() {
       <Button title="Get Current Location" onPress={fetchLocation} />
       {location && (
         <Text style={styles.text}>
-          Lat: {location.latitude}, Lon: {location.longitude}
+          Lat: {location.latitude}, Lon: {location.longitude} {location.isMocked ? '(Mocked)' : ''}
         </Text>
       )}
     </View>
@@ -377,6 +380,25 @@ function startAndroidTracking() {
   const subscription = onLocationForegroundServiceChange((location) => {
     console.log('Foreground Service location update:', location);
   });
+}
+```
+
+### 5. Mock Location Detection
+Identify if the device location is spoofed or simulated. Note that on Android this requires location permissions to be granted first (it retrieves the current location to verify if it is mocked), whereas on iOS it queries the manager's current location:
+```tsx
+import { isLocationMocked } from '@rnpack/location';
+
+async function checkMockStatus() {
+  try {
+    const isMocked = await isLocationMocked();
+    if (isMocked) {
+      console.warn('The user is using a mocked/simulated location!');
+    } else {
+      console.log('Location is genuine.');
+    }
+  } catch (error) {
+    console.error('Failed to check mock location status:', error);
+  }
 }
 ```
 
