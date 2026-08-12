@@ -9,6 +9,7 @@ import android.app.Service
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo
+import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
@@ -22,30 +23,38 @@ import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
+import com.rnpack.location.Configs
 import com.rnpack.location.Constants
 import com.rnpack.location.RNPackLocationImpl
 import com.rnpack.location.dtos.LocationDTO
 
 class LocationForegroundService : Service() {
 
+  val sendLocationUpdates = { location: Location ->
+    val intent = Intent(Constants.LOCATION_FOREGROUND_SERVICE_BROADCAST_NAME)
+
+
+    intent.putExtra(LocationDTO::latitude.name, location.latitude)
+    intent.putExtra(LocationDTO::longitude.name, location.longitude)
+    intent.putExtra(LocationDTO::altitude.name, location.altitude)
+    intent.putExtra(LocationDTO::accuracy.name, location.accuracy)
+    intent.putExtra(LocationDTO::timestamp.name, location.time)
+    intent.putExtra(
+      LocationDTO::isMocked.name,
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) location.isMock else location.isFromMockProvider
+    )
+    intent.putExtra(LocationDTO::provider.name, location.provider)
+
+    intent.setPackage(packageName)
+
+    sendBroadcast(intent)
+  }
+
   val locationCallback = object : LocationCallback() {
     override fun onLocationResult(locationResult: LocationResult) {
 
       for (location in locationResult.locations) {
-
-        val intent = Intent(Constants.LOCATION_FOREGROUND_SERVICE_BROADCAST_NAME)
-
-
-        intent.putExtra(LocationDTO::latitude.name, location.latitude)
-        intent.putExtra(LocationDTO::longitude.name, location.longitude)
-        intent.putExtra(LocationDTO::altitude.name, location.altitude)
-        intent.putExtra(LocationDTO::accuracy.name, location.accuracy)
-        intent.putExtra(LocationDTO::timestamp.name, location.time)
-        intent.putExtra(LocationDTO::isMocked.name, if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) location.isMock else location.isFromMockProvider)
-
-        intent.setPackage(packageName)
-
-        sendBroadcast(intent)
+        sendLocationUpdates(location)
       }
     }
   }
@@ -120,8 +129,14 @@ class LocationForegroundService : Service() {
         return
       }
 
+      val locationConfig = Configs.DEFAULT_LOCATION_CONFIGURATION
+
       rnPackLocation.subscribeToLocationChange(
-        reactApplicationContext, locationRequest, locationCallback
+        reactApplicationContext,
+        locationConfig,
+        sendLocationUpdates,
+        locationRequest,
+        locationCallback
       )
     }
   }
@@ -165,6 +180,7 @@ class LocationForegroundService : Service() {
       putDouble(LocationDTO::accuracy.name, location.accuracy)
       putLong(LocationDTO::timestamp.name, location.timestamp)
       putBoolean(LocationDTO::isMocked.name, location.isMocked)
+      putString(LocationDTO::provider.name, location.provider)
     }
 
     serviceIntent.putExtras(bundle)

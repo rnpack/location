@@ -27,6 +27,7 @@ export type LocationResponse = {
   accuracy: number;
   timestamp: number;
   isMocked: boolean;
+  provider: string;
 };
 
 export enum LocationPriority {
@@ -52,6 +53,8 @@ export type LocationConfiguration = {
   durationMillis?: number;
   maxUpdateDelayMillis?: number;
   granularity?: LocationGranularity;
+  // Android only
+  provider?: 'gps' | 'network' | 'passive' | 'fused'; // by default 'fused' will be used
 };
 
 export type BackgroundLocationConfiguration = {

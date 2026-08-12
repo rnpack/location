@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.location.Location
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
@@ -27,7 +28,6 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReadableMap
 import com.facebook.react.bridge.WindowFocusChangeListener
 import com.facebook.react.bridge.WritableMap
-import com.facebook.react.bridge.WritableNativeMap
 import com.facebook.react.modules.core.PermissionAwareActivity
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -76,7 +76,7 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  private val locationRequest = LocationRequest.Builder(
+  private var locationRequest = LocationRequest.Builder(
     Priority.PRIORITY_BALANCED_POWER_ACCURACY, locationConfiguration.intervalMillis
   ).setMinUpdateIntervalMillis(locationConfiguration.minUpdateIntervalMillis)
     .setMinUpdateDistanceMeters(locationConfiguration.minUpdateDistanceMeters)
@@ -86,11 +86,15 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
     .setGranularity(locationConfiguration.granularity)
     .setDurationMillis(locationConfiguration.durationMillis).build()
 
+  val sendLocationUpdates = { location: Location ->
+    emitOnLocationChange(LocationDTO.fromAndroidLocation(location).toWritableMap())
+  }
+
   private val locationCallback = object : LocationCallback() {
     override fun onLocationResult(locationResult: LocationResult) {
 
       for (location in locationResult.locations) {
-        emitOnLocationChange(LocationDTO.fromAndroidLocation(location).toWritableMap())
+        sendLocationUpdates(location)
       }
     }
   }
@@ -159,6 +163,16 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
     val configuration: LocationConfiguration = LocationConfiguration.fromReadableMap(config)
 
     locationConfiguration = configuration
+
+    locationRequest = LocationRequest.Builder(
+      Priority.PRIORITY_BALANCED_POWER_ACCURACY, configuration.intervalMillis
+    ).setMinUpdateIntervalMillis(configuration.minUpdateIntervalMillis)
+      .setMinUpdateDistanceMeters(configuration.minUpdateDistanceMeters)
+      .setMaxUpdateAgeMillis(configuration.maxUpdateAgeMillis)
+      .setWaitForAccurateLocation(configuration.waitForAccurateLocation)
+      .setMaxUpdateDelayMillis(configuration.maxUpdateDelayMillis)
+      .setGranularity(configuration.granularity).setDurationMillis(configuration.durationMillis)
+      .build()
   }
 
   override fun isLocationEnabled(): Boolean {
@@ -169,9 +183,7 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
     val result = rnPackLocation.isLocationAuthorized(reactApplicationContext)
 
     val locationAccessPermissionResult = LocationAccessPermissionResult(
-      status = result.fine || result.coarse,
-      fine = result.fine,
-      coarse = result.coarse
+      status = result.fine || result.coarse, fine = result.fine, coarse = result.coarse
     )
 
     return locationAccessPermissionResult.toWritableMap()
@@ -182,10 +194,11 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
 
     rnPackLocation.getLastLocation(
       reactApplicationContext,
-
+      locationConfiguration,
       onSuccess = { lastLocation ->
         promise.resolve(LocationDTO.fromAndroidLocation(lastLocation).toWritableMap())
-      }, onError = { exception ->
+      },
+      onError = { exception ->
         promise.reject(exception)
       })
   }
@@ -216,6 +229,7 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
     rnPackLocation.getFreshCurrentLocation(
       reactApplicationContext,
       locationPriority,
+      locationConfiguration,
       onSuccess = { lastLocation ->
         promise.resolve(LocationDTO.fromAndroidLocation(lastLocation).toWritableMap())
       },
@@ -268,7 +282,11 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
   override fun subscribeToLocationChange() {
 
     rnPackLocation.subscribeToLocationChange(
-      reactApplicationContext, locationRequest, locationCallback
+      reactApplicationContext,
+      locationConfiguration,
+      sendLocationUpdates,
+      locationRequest,
+      locationCallback
     )
   }
 
@@ -290,9 +308,10 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
           val accuracy = intent.getFloatExtra(LocationDTO::accuracy.name, 0F)
           val timestamp = intent.getLongExtra(LocationDTO::timestamp.name, 0L)
           val isMocked = intent.getBooleanExtra(LocationDTO::isMocked.name, false)
+          val provider = intent.getStringExtra(LocationDTO::provider.name)
 
           val locationDto = LocationDTO(
-            latitude, longitude, altitude, accuracy.toDouble(), timestamp, isMocked
+            latitude, longitude, altitude, accuracy.toDouble(), timestamp, isMocked, provider
           )
 
           Log.d(
@@ -433,8 +452,7 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
       }
 
       val sharedPrefs = reactApplicationContext.getSharedPreferences(
-        Configs.BACKGROUND_LOCATION_CONFIG_SHARED_PREFERENCES_DATABASE,
-        Context.MODE_PRIVATE
+        Configs.BACKGROUND_LOCATION_CONFIG_SHARED_PREFERENCES_DATABASE, Context.MODE_PRIVATE
       )
 
       sharedPrefs.edit {
@@ -491,8 +509,10 @@ class NativeRNPackLocationModule(reactContext: ReactApplicationContext) :
     rnPackLocation.getFreshCurrentLocation(
       reactApplicationContext,
       Priority.PRIORITY_BALANCED_POWER_ACCURACY,
+      locationConfiguration,
       onSuccess = { location ->
-        val isMocked: Boolean = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) location.isMock else location.isFromMockProvider
+        val isMocked: Boolean =
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) location.isMock else location.isFromMockProvider
         promise.resolve(isMocked)
       },
       onError = { exception ->

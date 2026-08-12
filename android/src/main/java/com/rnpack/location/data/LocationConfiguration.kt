@@ -13,7 +13,8 @@ data class LocationConfiguration(
   val maxUpdateAgeMillis: Long,
   val durationMillis: Long,
   val maxUpdateDelayMillis: Long,
-  val granularity: Int
+  val granularity: Int,
+  val provider: String?
 ) {
   companion object {
     fun fromReadableMap(map: ReadableMap): LocationConfiguration {
@@ -21,7 +22,7 @@ data class LocationConfiguration(
         priority = if (map.hasKey("priority")) map.getDouble("priority")
           .toInt() else Priority.PRIORITY_BALANCED_POWER_ACCURACY,
         intervalMillis = if (map.hasKey("intervalMillis")) map.getDouble("intervalMillis")
-          .toLong() else 5000L,
+          .toLong() else 30000L,
         minUpdateIntervalMillis = if (map.hasKey("minUpdateIntervalMillis")) map.getDouble("minUpdateIntervalMillis")
           .toLong() else 10000L,
         waitForAccurateLocation = if (map.hasKey("waitForAccurateLocation")) map.getBoolean("waitForAccurateLocation") else false,
@@ -35,6 +36,11 @@ data class LocationConfiguration(
           .toLong() else 2000,
         granularity = if (map.hasKey("granularity")) map.getDouble("granularity")
           .toInt() else Granularity.GRANULARITY_PERMISSION_LEVEL,
+        provider = if (map.hasKey("provider")) if (LocationProvider.entries.any {
+            it.value == map.getString(
+              "provider"
+            )
+          }) map.getString("provider") else LocationProvider.FUSED.value else LocationProvider.FUSED.value
       )
     }
   }

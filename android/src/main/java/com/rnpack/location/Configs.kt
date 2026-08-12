@@ -7,7 +7,7 @@ import com.rnpack.location.data.LocationConfiguration
 object Configs {
   val DEFAULT_LOCATION_CONFIGURATION: LocationConfiguration = LocationConfiguration(
     priority = Priority.PRIORITY_BALANCED_POWER_ACCURACY,
-    intervalMillis = 5000,
+    intervalMillis = 30000,
     minUpdateIntervalMillis = 10000,
     waitForAccurateLocation = false,
     minUpdateDistanceMeters = 5.0f,
@@ -15,6 +15,7 @@ object Configs {
     durationMillis = Long.MAX_VALUE,
     maxUpdateDelayMillis = 2000,
     granularity = Granularity.GRANULARITY_PERMISSION_LEVEL,
+    provider = "fused"
   )
   const val BACKGROUND_LOCATION_CONFIG_SHARED_PREFERENCES_DATABASE = "BackgroundLocationPrefs"
 }

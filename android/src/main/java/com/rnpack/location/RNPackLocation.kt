@@ -19,6 +19,7 @@ interface RNPackLocation {
   fun isLocationAuthorized(reactApplicationContext: ReactApplicationContext): LocationAccessPermissionResult
   fun getLastLocation(
     reactApplicationContext: ReactApplicationContext,
+    locationConfig: LocationConfiguration,
     onSuccess: (Location) -> Unit,
     onError: (Exception) -> Unit,
   )
@@ -26,6 +27,7 @@ interface RNPackLocation {
   fun getFreshCurrentLocation(
     reactApplicationContext: ReactApplicationContext,
     priority: Int,
+    locationConfig: LocationConfiguration,
     onSuccess: (Location) -> Unit,
     onError: (Exception) -> Unit,
   )
@@ -53,6 +55,8 @@ interface RNPackLocation {
 
   fun subscribeToLocationChange(
     reactApplicationContext: ReactApplicationContext,
+    locationConfig: LocationConfiguration,
+    onResult: (Location) -> Unit,
     locationRequest: LocationRequest,
     locationCallback: LocationCallback
   );

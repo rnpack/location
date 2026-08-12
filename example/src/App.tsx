@@ -39,6 +39,7 @@ import {
   configureBackgroundLocation,
   onBackgroundLocationChange,
   isLocationMocked,
+  configureLocation,
 } from '@rnpack/location';
 
 import type {
@@ -181,7 +182,7 @@ function Main() {
     }
   }
 
-  async function onPressIsLocaitonMocked() {
+  async function onPressIsLocationMocked() {
     const isMocked = await isLocationMocked();
 
     setIsMockedLocation(isMocked);
@@ -228,6 +229,15 @@ function Main() {
             onPress={openLocationPermissionsSettings}
           />
           <Button
+            title="Configure Location"
+            onPress={() => {
+              configureLocation({
+                provider: 'gps',
+                intervalMillis: 30000,
+              });
+            }}
+          />
+          <Button
             title="Get Last Location"
             onPress={accessLastLocation}
             disabled={isGettingLastLocation}
@@ -252,7 +262,7 @@ function Main() {
           />
           <Button
             title="Is Location Mocked"
-            onPress={onPressIsLocaitonMocked}
+            onPress={onPressIsLocationMocked}
           />
         </View>
         <Text>

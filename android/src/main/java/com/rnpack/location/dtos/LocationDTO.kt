@@ -10,7 +10,8 @@ data class LocationDTO(
   val altitude: Double,
   val accuracy: Double,
   val timestamp: Long,
-  val isMocked: Boolean
+  val isMocked: Boolean,
+  val provider: String?
 ) {
 
   fun toWritableMap(): WritableNativeMap {
@@ -21,6 +22,7 @@ data class LocationDTO(
       putDouble(LocationDTO::accuracy.name, accuracy)
       putLong(LocationDTO::timestamp.name, timestamp)
       putBoolean(LocationDTO::isMocked.name, isMocked)
+      putString(LocationDTO::provider.name, provider)
     }
   }
 
@@ -32,7 +34,8 @@ data class LocationDTO(
         altitude = location.altitude,
         accuracy = location.accuracy.toDouble(),
         timestamp = location.time,
-        isMocked = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) location.isMock else location.isFromMockProvider
+        isMocked = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) location.isMock else location.isFromMockProvider,
+        provider = location.provider
       )
     }
   }
