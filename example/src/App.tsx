@@ -110,6 +110,7 @@ function Main() {
       });
 
     onLocationChangeSubscriptionRef.current = onLocationChange((result) => {
+      console.info('onLocationChange updates: ', result);
       setLocationUpdate(result);
     });
 
@@ -123,8 +124,6 @@ function Main() {
     subscribeToLocationProvidersChange();
 
     subscribeToLocationPermissionsChange();
-
-    subscribeToLocationChange();
 
     return () => {
       onLocationProvidersChangeSubscriptionRef.current?.remove();
@@ -234,6 +233,7 @@ function Main() {
               configureLocation({
                 provider: 'gps',
                 intervalMillis: 30000,
+                minUpdateDistanceMeters: 0,
               });
             }}
           />
@@ -251,6 +251,10 @@ function Main() {
             title="Get Fresh Current Location"
             onPress={accessFreshCurrentLocation}
             disabled={isGettingFreshCurrentLocation}
+          />
+          <Button
+            title="Start Location Updates"
+            onPress={subscribeToLocationChange}
           />
           <Button
             title="Start Location Background Service"

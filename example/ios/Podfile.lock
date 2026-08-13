@@ -3,7 +3,7 @@ PODS:
   - hermes-engine (250829098.0.10):
     - hermes-engine/Pre-built (= 250829098.0.10)
   - hermes-engine/Pre-built (250829098.0.10)
-  - Location (0.2.1):
+  - Location (0.2.2):
     - hermes-engine
     - RCTRequired
     - RCTTypeSafety
@@ -2074,7 +2074,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   FBLazyVector: c00c20551d40126351a6783c47ce75f5b374851b
   hermes-engine: 8816e5afa00bb31832bfd6bbea92c9927175b928
-  Location: 24fe1993051a8ec94d841a78918fa55699d02cee
+  Location: a20578c72c9160701b9bcb3149806e55e1aba464
   RCTDeprecation: 3bb167081b134461cfeb875ff7ae1945f8635257
   RCTRequired: 74839f55d5058a133a0bc4569b0afec750957f64
   RCTSwiftUI: 87a316382f3eab4dd13d2a0d0fd2adcce917361a

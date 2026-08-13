@@ -14,12 +14,13 @@ NSString * const kLocationKeyRestricted    = @"Restricted";
 NSString * const kLocationKeyDenied        = @"Denied";
 NSString * const kLocationKeyNotDetermined = @"NotDetermined";
 
-NSString * const kLocationResponseKeyLatitude  =@"latitude";
-NSString * const kLocationResponseKeyLongitude =@"longitude";
-NSString * const kLocationResponseKeyAltitude   =@"altitude";
-NSString * const kLocationResponseKeyAccuracy  =@"accuracy";
-NSString * const kLocationResponseKeyTimestamp  =@"timestamp";
-NSString * const kLocationResponseKeyIsMocked  =@"isMocked";
+NSString * const kLocationResponseKeyLatitude  = @"latitude";
+NSString * const kLocationResponseKeyLongitude = @"longitude";
+NSString * const kLocationResponseKeyAltitude  = @"altitude";
+NSString * const kLocationResponseKeyAccuracy  = @"accuracy";
+NSString * const kLocationResponseKeyTimestamp = @"timestamp";
+NSString * const kLocationResponseKeyIsMocked  = @"isMocked";
+NSString * const kLocationResponseKeyProvider  = @"provider";
 
 int locationProviderChangeListenerCount = 0;
 int locationPermissionChangeListenerCount = 0;
@@ -42,7 +43,8 @@ NSDictionary *locationUpdate = @{
   kLocationResponseKeyAltitude: [NSNull null],
   kLocationResponseKeyAccuracy: [NSNull null],
   kLocationResponseKeyTimestamp: [NSNull null],
-  kLocationResponseKeyIsMocked: [NSNull null]
+  kLocationResponseKeyIsMocked: [NSNull null],
+  kLocationResponseKeyProvider: [NSNull null]
 };
 
 - (instancetype) init {
@@ -92,6 +94,8 @@ NSDictionary *locationUpdate = @{
       
       locationRes[kLocationResponseKeyIsMocked] = @([self isMockedLocation]);
       
+      locationRes[kLocationResponseKeyProvider] = @"ios";
+      
       if(locationChangeListenerCount > 0) {
         [self emitOnLocationChange:locationRes];
       }
@@ -132,7 +136,21 @@ NSDictionary *locationUpdate = @{
   NSDictionary *auth = self.isLocationAuthorized;
   
   if(auth[kLocationKeyIosStatus] == kLocationKeyNotDetermined) {
-    [self.locationManager requestAlwaysAuthorization];
+    
+    NSString *alwaysUseDesc = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysAndWhenInUseUsageDescription"];
+    
+    if (alwaysUseDesc && [alwaysUseDesc length] > 0) {
+      [_locationManager requestAlwaysAuthorization];
+    }
+    
+    NSString *whenInUseDesc = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
+    
+    if (!whenInUseDesc || [whenInUseDesc length] == 0) {
+      NSLog(@"MISSING_INFO_PLIST", @"The Info.plist is missing 'NSLocationWhenInUseUsageDescription'. Location request aborted.", nil);
+      return;
+    }
+    
+    [_locationManager requestWhenInUseAuthorization];
   }
   
   if(auth[kLocationKeyIosStatus] != kLocationKeyAlways && auth[kLocationKeyIosStatus] != kLocationKeyWhenInUse) {
@@ -238,8 +256,10 @@ NSDictionary *locationUpdate = @{
   if(@available(iOS 9.0, *)) {
     [_locationManager requestLocation];
   }
-  
-  [_locationManager startUpdatingLocation];
+
+  if(locationChangeListenerCount > 0) {
+    [_locationManager startUpdatingLocation];
+  }
 }
 
 - (void)getLastLocation:(RCTPromiseResolveBlock)resolve reject:(RCTPromiseRejectBlock)reject {
@@ -351,8 +371,37 @@ NSDictionary *locationUpdate = @{
 - (void)configureBackgroundLocation:(JS::NativeRNPackLocation::BackgroundLocationConfiguration &)config {
 }
 
+- (CLLocationAccuracy)getLocationAccuracyFromPriority:(double)priorityEnum {
+  CLLocationAccuracy accuracy;
+  
+  switch ((int)priorityEnum) {
+    case 100: // PRIORITY_HIGH_ACCURACY
+      accuracy = kCLLocationAccuracyBest;
+      break;
+    case 102: // PRIORITY_BALANCED_POWER_ACCURACY
+      accuracy = kCLLocationAccuracyNearestTenMeters;
+      break;
+    case 104: // PRIORITY_LOW_POWER
+      accuracy = kCLLocationAccuracyKilometer;
+      break;
+    case 105: // PRIORITY_PASSIVE
+      accuracy = kCLLocationAccuracyThreeKilometers;
+      break;
+    default:
+      accuracy = kCLLocationAccuracyBest; // Fallback default
+      break;
+  }
+  
+  return accuracy;
+}
 
 - (void)configureLocation:(JS::NativeRNPackLocation::LocationConfiguration &)config {
+  
+  double minUpdateDistanceMeters = config.minUpdateDistanceMeters().value_or(5.0);
+  double priority = config.priority().value_or(100);
+  
+  _locationManager.desiredAccuracy = [self getLocationAccuracyFromPriority:priority];
+  _locationManager.distanceFilter = minUpdateDistanceMeters;
 }
 
 
@@ -395,6 +444,12 @@ NSDictionary *locationUpdate = @{
   locationProviderChangeListenerCount = 0;
   locationPermissionChangeListenerCount = 0;
   locationChangeListenerCount = 0;
+}
+
+- (void)dealloc {
+  [_locationManager stopUpdatingLocation];
+  _locationManager.delegate = nil;
+  _locationManager = nil;
 }
 
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
